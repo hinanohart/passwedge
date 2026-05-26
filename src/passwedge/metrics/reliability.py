@@ -163,8 +163,7 @@ def meltdown_onset_point(
     Returns ``math.inf`` if no meltdown is detected. Thresholds are **required** (no
     defaults): they are dataset-specific and applying the paper's values verbatim to
     other data produces false positives. Pass ``**MOP_PAPER_DEFAULTS`` to opt in to the
-    paper's calibration (note ``MOP_PAPER_DEFAULTS['w']`` is a float -- cast to int).
-    For ``t < w`` the prior entropy ``H(t-w)`` is taken as 0.
+    paper's calibration. For ``t < w`` the prior entropy ``H(t-w)`` is taken as 0.
     """
     if w < 1:
         raise ValueError("window size w must be >= 1")

@@ -102,9 +102,16 @@ def test_agent_is_reliable():
 ## Where it fits
 
 passwedge is the *measurement layer*: it consumes repeated-attempt outcomes (a bool list,
-a JSON file, or a trace export) and reports reliability. It does not run rollouts, score
-reward functions, or detect reward hacking — those belong to other tools. It pairs naturally
-with eval/verification harnesses that produce the per-attempt outcomes it ingests.
+a JSON file, or a trace export) and reports reliability. It deliberately does **not** run
+rollouts, score reward/fitness functions, audit reward gameability, or detect reward hacking
+— those are separate concerns handled by tools such as
+[`scorewright`](https://github.com/hinanohart/scorewright) (fitness scoring + anti-gaming),
+[`rewardfuzz`](https://github.com/hinanohart/rewardfuzz) (reward gameability auditing), and
+[`mav-bench`](https://github.com/hinanohart/mav-bench) (multi-agent verification). passwedge
+sits one layer up from those: feed it the per-attempt pass/fail outcomes they (or any eval
+harness) produce, and it tells you how *reliably* the agent succeeds. For confidence /
+hallucination fragility see [`yuragi`](https://github.com/hinanohart/yuragi); for streaming
+inference verification see [`conformlock`](https://github.com/hinanohart/conformlock).
 
 ## License
 

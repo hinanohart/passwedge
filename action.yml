@@ -74,8 +74,10 @@ runs:
         if [ -n "${{ inputs.fail-under }}" ]; then args+=(--fail-under "${{ inputs.fail-under }}"); fi
         set +e
         passwedge "${args[@]}"
-        echo "passwedge exit code: $?"
+        rc=$?
         set -e
+        echo "rc=$rc" >> "$GITHUB_OUTPUT"
+        echo "passwedge exited with code $rc"
     - if: ${{ inputs.comment == 'true' && github.event_name == 'pull_request' }}
       uses: actions/github-script@v7
       with:
@@ -94,7 +96,12 @@ runs:
           }
     - shell: bash
       run: |
-        if [ "${{ steps.report.outputs.passed }}" = "false" ]; then
+        # Fail closed: a passwedge crash (rc>=2) or any non-"true" gate result fails the job.
+        if [ "${{ steps.report.outputs.rc }}" -ge 2 ]; then
+          echo "::error::passwedge crashed (exit ${{ steps.report.outputs.rc }})"
+          exit 1
+        fi
+        if [ "${{ steps.report.outputs.passed }}" != "true" ]; then
           echo "::error::passwedge reliability gate failed (${{ inputs.metric }} < ${{ inputs.fail-under }})"
           exit 1
         fi
