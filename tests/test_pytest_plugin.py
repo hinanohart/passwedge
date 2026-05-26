@@ -68,3 +68,26 @@ def test_passk_marker_requires_threshold(pytester: pytest.Pytester) -> None:
     )
     result = pytester.runpytest_subprocess()
     result.assert_outcomes(failed=1)  # ValueError: set a threshold
+
+
+def test_passk_marker_in_process_with_fixture(pytester: pytest.Pytester) -> None:
+    """Run in-process (so coverage measures ``pytest_pyfunc_call``) with a fixture argument,
+    which exercises the ``_fixtureinfo.argnames`` resolution path that the subprocess tests
+    above leave uncovered."""
+    pytester.makepyfile(
+        """
+        import pytest
+
+        @pytest.fixture
+        def budget():
+            return 3
+
+        @pytest.mark.passk(attempts=6, k=2, min_pass_pow_k=0.99)
+        def test_uses_a_fixture(budget):
+            assert budget == 999  # always fails, independent of the fixture value
+        """
+    )
+    result = pytester.runpytest()  # in-process: the plugin hook is measured by coverage
+    result.assert_outcomes(failed=1)
+    # This line is emitted only by the passk hook, confirming it ran (with the fixture arg).
+    result.stdout.fnmatch_lines(["*0/6 attempts passed*"])

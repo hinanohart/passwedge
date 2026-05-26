@@ -61,7 +61,7 @@ prints a Markdown report, emits `$GITHUB_OUTPUT` values, and exits non-zero if t
 metric is below the threshold. In a workflow, use the bundled action:
 
 ```yaml
-- uses: hinanohart/passwedge@v0.0.1a1
+- uses: hinanohart/passwedge@v0.0.1a2
   with:
     input: trials.json
     fail-under: "0.5"

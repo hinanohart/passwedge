@@ -39,7 +39,7 @@ inputs:
   version:
     description: "passwedge version to install."
     required: false
-    default: "0.0.1a1"
+    default: "0.0.1a2"
   python-version:
     description: "Python version to set up."
     required: false
@@ -83,6 +83,10 @@ runs:
       with:
         script: |
           const fs = require('fs');
+          if (!fs.existsSync('passwedge-report.md')) {
+            core.warning('passwedge produced no report (it crashed); the gate step below will fail the job.');
+            return;
+          }
           const marker = '<!-- passwedge-report -->';
           const body = fs.readFileSync('passwedge-report.md', 'utf8');
           const { owner, repo } = context.repo;

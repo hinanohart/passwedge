@@ -13,6 +13,7 @@ from pathlib import Path
 
 from . import __version__
 from .adapters.generic import read_trials_file
+from .metrics.bayes import PRIOR_PRESETS
 from .report.markdown import render_markdown
 from .report.summary import ReliabilitySummary, summarize
 
@@ -34,6 +35,18 @@ def _parse_ks(text: str) -> tuple[int, ...]:
     return ks
 
 
+def _credible_level(text: str) -> float:
+    try:
+        value = float(text)
+    except ValueError:
+        raise argparse.ArgumentTypeError(
+            f"--credible-level must be a number, got {text!r}"
+        ) from None
+    if not 0.0 < value < 1.0:
+        raise argparse.ArgumentTypeError(f"--credible-level must be in (0, 1), got {value}")
+    return value
+
+
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="passwedge", description=__doc__)
     parser.add_argument("--version", action="version", version=f"passwedge {__version__}")
@@ -43,8 +56,13 @@ def _build_parser() -> argparse.ArgumentParser:
     ci.add_argument("--input", "-i", required=True, type=Path, help="JSON file of task records")
     ci.add_argument("--k", type=_parse_ks, default=(1, 2, 5), help="comma-separated k values")
     ci.add_argument("--main-k", type=int, default=None, help="headline k (default: largest k)")
-    ci.add_argument("--prior", default="jeffreys", help="Bayesian prior (jeffreys/uniform/paper)")
-    ci.add_argument("--credible-level", type=float, default=0.95)
+    ci.add_argument(
+        "--prior",
+        choices=sorted(PRIOR_PRESETS),
+        default="jeffreys",
+        help="Bayesian prior preset (default: jeffreys)",
+    )
+    ci.add_argument("--credible-level", type=_credible_level, default=0.95)
     ci.add_argument("--metric", choices=sorted(_METRIC_GETTERS), default="pass_pow_k")
     ci.add_argument("--fail-under", type=float, default=None, help="exit 1 if metric < this")
     ci.add_argument("--output", "-o", type=Path, default=None, help="write Markdown report here")

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "passwedge"
-version = "0.0.1a1"
+version = "0.0.1a2"
 description = "Reliability-science metrics for repeated-attempt evaluation of long-horizon LLM agents: pass@k, pass^k, Bayesian posteriors, RDC/VAF/GDS/MOP."
 readme = "README.md"
 requires-python = ">=3.10"

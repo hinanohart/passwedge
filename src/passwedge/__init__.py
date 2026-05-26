@@ -32,7 +32,7 @@ from .stats import (
     two_proportion_z_test,
 )
 
-__version__ = "0.0.1a1"
+__version__ = "0.0.1a2"
 
 __all__ = [
     "MOP_PAPER_DEFAULTS",

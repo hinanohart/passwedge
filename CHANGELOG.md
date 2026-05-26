@@ -4,6 +4,28 @@ All notable changes to passwedge are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/), and the project aims to follow
 [Semantic Versioning](https://semver.org/) once it reaches `0.1.0`.
 
+## [0.0.1a2] - 2026-05-27
+
+Polish from a second independent verification pass. The metrics, formulas, and numeric
+outputs are unchanged; these are documentation, validation, and tooling refinements.
+
+### Changed
+- `two_proportion_z_test`: the docstring now matches behavior -- a zero pooled variance
+  (both samples entirely pass or entirely fail) returns `z=0, p_value=1` instead of
+  raising. Removed a branch that was provably unreachable.
+- `passwedge ci` validates `--prior` (against the known presets) and `--credible-level`
+  (must lie in `(0, 1)`) at the argument layer, so invalid input now exits with a clean
+  usage error (exit code 2) rather than a raw traceback.
+
+### Fixed
+- The GitHub Action no longer surfaces an opaque `ENOENT` when `passwedge` crashes before
+  writing its report: it emits a warning and lets the dedicated fail-closed gate step
+  report the failure.
+
+### Tests
+- Added an in-process `pytester` test covering the plugin's fixture-argument resolution
+  path.
+
 ## [0.0.1a1] - 2026-05-27
 
 First public pre-alpha.
@@ -29,4 +51,5 @@ First public pre-alpha.
 - arXiv:2510.04265 does not define a metric named "Bayes@k"; the Bayesian helpers are
   passwedge's operationalization of that paper's framework.
 
+[0.0.1a2]: https://github.com/hinanohart/passwedge/releases/tag/v0.0.1a2
 [0.0.1a1]: https://github.com/hinanohart/passwedge/releases/tag/v0.0.1a1

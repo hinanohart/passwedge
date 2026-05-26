@@ -25,9 +25,12 @@ def _normal_sf(x: float) -> float:
 def two_proportion_z_test(c1: int, n1: int, c2: int, n2: int) -> ZTestResult:
     """Two-sided two-proportion z-test comparing pass rates c1/n1 vs c2/n2.
 
-    Uses the pooled-variance z statistic. The two-sided p-value is computed from the
-    standard normal survival function via ``math.erfc``. Raises if either sample is
-    empty or both rates are identical degenerate (0 pooled variance).
+    Uses the pooled-variance z statistic; the two-sided p-value comes from the standard
+    normal survival function via ``math.erfc``. Raises ``ValueError`` if either sample is
+    empty (``n <= 0``) or a count falls outside ``0 <= c <= n``. When the pooled variance
+    is 0 -- both samples entirely fail or entirely pass, so the two rates are identical --
+    there is nothing to test against and the result is reported as ``z=0, p_value=1``
+    rather than raising.
     """
     if n1 <= 0 or n2 <= 0:
         raise ValueError("n1, n2 must be positive")
@@ -39,10 +42,10 @@ def two_proportion_z_test(c1: int, n1: int, c2: int, n2: int) -> ZTestResult:
     se = math.sqrt(pooled * (1.0 - pooled) * (1.0 / n1 + 1.0 / n2))
     diff = p1 - p2
     if se == 0.0:
-        # both pooled proportions are 0 or 1: no variance to test against
-        z = 0.0 if diff == 0.0 else math.copysign(math.inf, diff)
-        p_value = 1.0 if diff == 0.0 else 0.0
-        return ZTestResult(z=z, p_value=p_value, diff=diff)
+        # Zero pooled variance occurs only when ``pooled`` is 0 or 1, i.e. both samples are
+        # entirely failures or entirely successes. Then p1 == p2 == pooled and diff == 0,
+        # so there is no variance to test against: report a non-significant result.
+        return ZTestResult(z=0.0, p_value=1.0, diff=0.0)
     z = diff / se
     p_value = 2.0 * _normal_sf(abs(z))
     return ZTestResult(z=z, p_value=p_value, diff=diff)
