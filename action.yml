@@ -96,9 +96,10 @@ runs:
           }
     - shell: bash
       run: |
-        # Fail closed: a passwedge crash (rc>=2) or any non-"true" gate result fails the job.
+        # Fail closed. A usage error (rc>=2) fails here; a runtime crash (rc=1, no
+        # passed= written) or a gate failure leaves passed != "true" and fails below.
         if [ "${{ steps.report.outputs.rc }}" -ge 2 ]; then
-          echo "::error::passwedge crashed (exit ${{ steps.report.outputs.rc }})"
+          echo "::error::passwedge usage error (exit ${{ steps.report.outputs.rc }})"
           exit 1
         fi
         if [ "${{ steps.report.outputs.passed }}" != "true" ]; then
