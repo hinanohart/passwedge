@@ -1,0 +1,84 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "passwedge"
+version = "0.0.1a1"
+description = "Reliability-science metrics for repeated-attempt evaluation of long-horizon LLM agents: pass@k, pass^k, Bayesian posteriors, RDC/VAF/GDS/MOP."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [{ name = "hinanohart" }]
+keywords = ["llm", "agents", "evaluation", "reliability", "pass@k", "pass^k", "benchmark"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Typing :: Typed",
+]
+dependencies = [
+    "numpy>=1.24",
+    "scipy>=1.10",
+]
+
+[project.urls]
+Homepage = "https://github.com/hinanohart/passwedge"
+Repository = "https://github.com/hinanohart/passwedge"
+Issues = "https://github.com/hinanohart/passwedge/issues"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "hypothesis>=6.90",
+    "ruff>=0.6",
+    "mypy>=1.8",
+    "build>=1.0",
+    "twine>=5.0",
+]
+repro = ["scorio>=0.2"]
+
+[project.scripts]
+passwedge = "passwedge.cli:main"
+
+[project.entry-points.pytest11]
+passwedge = "passwedge.pytest_plugin"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/passwedge"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/passwedge", "tests", "docs/DEFINITIONS.md", "README.md", "LICENSE"]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+packages = ["passwedge"]
+mypy_path = "src"
+
+[[tool.mypy.overrides]]
+module = ["scipy.*", "scorio.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "passk: assert a pass@k / pass^k reliability threshold on repeated test outcomes",
+]
