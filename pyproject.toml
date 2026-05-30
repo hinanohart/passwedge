@@ -8,7 +8,7 @@ version = "0.0.1a2"
 description = "Reliability-science metrics for repeated-attempt evaluation of long-horizon LLM agents: pass@k, pass^k, Bayesian posteriors, RDC/VAF/GDS/MOP."
 readme = "README.md"
 requires-python = ">=3.10"
-license = "Apache-2.0"
+license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "hinanohart" }]
 keywords = ["llm", "agents", "evaluation", "reliability", "pass@k", "pass^k", "benchmark"]

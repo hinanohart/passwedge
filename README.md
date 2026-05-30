@@ -115,4 +115,4 @@ inference verification see [`conformlock`](https://github.com/hinanohart/conform
 
 ## License
 
-[Apache-2.0](LICENSE).
+[MIT](LICENSE).
