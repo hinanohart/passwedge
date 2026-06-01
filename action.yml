@@ -63,15 +63,25 @@ runs:
       with:
         python-version: ${{ inputs.python-version }}
     - shell: bash
-      run: python -m pip install "passwedge==${{ inputs.version }}"
+      env:
+        PW_VERSION: ${{ inputs.version }}
+      run: python -m pip install "passwedge==$PW_VERSION"
     - id: report
       shell: bash
+      env:
+        PW_INPUT: ${{ inputs.input }}
+        PW_K: ${{ inputs.k }}
+        PW_PRIOR: ${{ inputs.prior }}
+        PW_METRIC: ${{ inputs.metric }}
+        PW_TITLE: ${{ inputs.title }}
+        PW_MAIN_K: ${{ inputs.main-k }}
+        PW_FAIL_UNDER: ${{ inputs.fail-under }}
       run: |
-        args=(ci --input "${{ inputs.input }}" --k "${{ inputs.k }}" \
-              --prior "${{ inputs.prior }}" --metric "${{ inputs.metric }}" \
-              --title "${{ inputs.title }}" --output passwedge-report.md --github-output)
-        if [ -n "${{ inputs.main-k }}" ]; then args+=(--main-k "${{ inputs.main-k }}"); fi
-        if [ -n "${{ inputs.fail-under }}" ]; then args+=(--fail-under "${{ inputs.fail-under }}"); fi
+        args=(ci --input "$PW_INPUT" --k "$PW_K" \
+              --prior "$PW_PRIOR" --metric "$PW_METRIC" \
+              --title "$PW_TITLE" --output passwedge-report.md --github-output)
+        if [ -n "$PW_MAIN_K" ]; then args+=(--main-k "$PW_MAIN_K"); fi
+        if [ -n "$PW_FAIL_UNDER" ]; then args+=(--fail-under "$PW_FAIL_UNDER"); fi
         set +e
         passwedge "${args[@]}"
         rc=$?
@@ -99,15 +109,20 @@ runs:
             await github.rest.issues.createComment({ owner, repo, issue_number, body });
           }
     - shell: bash
+      env:
+        PW_RC: ${{ steps.report.outputs.rc }}
+        PW_PASSED: ${{ steps.report.outputs.passed }}
+        PW_METRIC: ${{ inputs.metric }}
+        PW_FAIL_UNDER: ${{ inputs.fail-under }}
       run: |
         # Fail closed. A usage error (rc>=2) fails here; a runtime crash (rc=1, no
         # passed= written) or a gate failure leaves passed != "true" and fails below.
-        if [ "${{ steps.report.outputs.rc }}" -ge 2 ]; then
-          echo "::error::passwedge usage error (exit ${{ steps.report.outputs.rc }})"
+        if [ "$PW_RC" -ge 2 ]; then
+          echo "::error::passwedge usage error (exit $PW_RC)"
           exit 1
         fi
-        if [ "${{ steps.report.outputs.passed }}" != "true" ]; then
-          echo "::error::passwedge reliability gate failed (${{ inputs.metric }} < ${{ inputs.fail-under }})"
+        if [ "$PW_PASSED" != "true" ]; then
+          echo "::error::passwedge reliability gate failed ($PW_METRIC < $PW_FAIL_UNDER)"
           exit 1
         fi
         echo "passwedge reliability gate passed"
