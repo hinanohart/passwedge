@@ -1,0 +1,51 @@
+direction: down
+explanation: |md
+  ### passwedge
+  **Reliability-science metrics for repeated-attempt LLM agent evaluation** — measures the gap between capability (pass@k) and consistency across repeated runs.
+| {near: top-center}
+
+input: "① Repeated attempt\noutcomes (bool list / JSON)" {shape: oval; style: {fill: "#6366f1"; font-color: "#fff"; stroke: "#4338ca"; bold: true; font-size: 18}}
+coerce: "② coerce_trial\ndata.py" {style: {fill: "#0ea5e9"; font-color: "#fff"; stroke: "#0369a1"; bold: true; font-size: 18}}
+trial: "③ Trial\nn attempts · c successes" {style: {fill: "#dcfce7"; font-color: "#065f46"; bold: true}}
+
+metrics: "Metric Engines" {
+  style: {fill: "#f0fdf4"; stroke: "#10b981"; font-color: "#065f46"; bold: true; font-size: 16}
+  cap: "④ Capability metrics\npass_at_k · pass_pow_k"
+  rel: "④ Reliability metrics\nRDC · VAF · GDS"
+  bayes: "④ Bayesian metrics\nbeta_posterior · dirichlet"
+  *.style.fill: "#dcfce7"; *.style.font-color: "#065f46"
+}
+
+episodes: "Episodes\nwith tool traces" {shape: oval; style: {fill: "#6366f1"; font-color: "#fff"; stroke: "#4338ca"; bold: true; font-size: 18}}
+mop: "Meltdown onset\nmeltdown_onset_point" {style: {fill: "#fef3c7"; font-color: "#92400e"; stroke: "#f59e0b"; bold: true}}
+
+report: "⑤ ReliabilitySummary" {style: {fill: "#0ea5e9"; font-color: "#fff"; stroke: "#0369a1"; bold: true; font-size: 18}}
+
+outputs: "Outputs" {
+  style: {fill: "#fdf2f8"; stroke: "#ec4899"; font-color: "#9d174e"; bold: true; font-size: 16}
+  cli: "⑥ CLI passwedge ci\nMarkdown · GITHUB_OUTPUT · exit code" {shape: cylinder}
+  plugin: "pytest plugin\npass / fail test run" {shape: cylinder}
+  action: "GitHub Action\nPR comment table" {shape: cylinder}
+  *.style.fill: "#fdf2f8"; *.style.font-color: "#9d174e"
+}
+
+input -> coerce: "① parse"
+coerce -> trial: "② build"
+trial -> metrics.cap: "③ compute"
+trial -> metrics.rel: "③ compute"
+trial -> metrics.bayes: "③ compute"
+episodes -> mop: "detect"
+metrics.cap -> report: "⑤ collect"
+metrics.rel -> report: "⑤ collect"
+metrics.bayes -> report: "⑤ collect"
+mop -> report: "⑤ collect"
+report -> outputs.cli: "⑥ emit"
+report -> outputs.plugin: "⑥ emit"
+report -> outputs.action: "⑥ emit"
+
+legend: "Legend" {
+  near: bottom-center
+  style: {fill: "#f8fafc"; stroke: "#cbd5e1"; font-size: 13}
+  e: "● entry"; c: "● core"; p: "● processing"; b: "● external"; d: "● output"
+  e.style.font-color: "#4338ca"; c.style.font-color: "#0369a1"; p.style.font-color: "#10b981"; b.style.font-color: "#f59e0b"; d.style.font-color: "#ec4899"
+}

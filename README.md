@@ -19,22 +19,9 @@ gap: capability vs. reliability.
 
 ## Architecture
 
-```mermaid
-flowchart TD
-    Input[Repeated attempt outcomes<br>bool list or JSON file] --> Coerce[coerce_trial<br>data.py]
-    Coerce --> Trial[Trial n attempts c successes]
-    Trial --> Cap[Capability metrics<br>pass_at_k pass_pow_k]
-    Trial --> Rel[Reliability metrics<br>RDC VAF GDS]
-    Trial --> Bayes[Bayesian metrics<br>beta_posterior dirichlet_posterior]
-    Episodes[Episodes with tool traces] --> MOP[Meltdown onset<br>meltdown_onset_point]
-    Cap --> Report[ReliabilitySummary]
-    Rel --> Report
-    Bayes --> Report
-    MOP --> Report
-    Report --> CLI[CLI passwedge ci<br>Markdown report GITHUB_OUTPUT exit code]
-    Report --> Plugin[pytest plugin<br>pass or fail test run]
-    Report --> Action[GitHub Action<br>PR comment table]
-```
+<div align="center">
+  <img src="docs/architecture.png" alt="passwedge architecture" width="840">
+</div>
 
 ## Install
 
@@ -159,3 +146,4 @@ gameability, or detect reward hacking. Related tools for those concerns:
 ## License
 
 [MIT](LICENSE).
+
