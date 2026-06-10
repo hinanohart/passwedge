@@ -142,17 +142,19 @@ After computing metrics, `summarize()` produces a `ReliabilitySummary` dataclass
 
 ## Where it fits
 
-passwedge is the *measurement layer*: it consumes repeated-attempt outcomes (a bool list,
-a JSON file, or a trace export) and reports reliability. It deliberately does **not** run
-rollouts, score reward/fitness functions, audit reward gameability, or detect reward hacking
-— those are separate concerns handled by tools such as
-[`scorewright`](https://github.com/hinanohart/scorewright) (fitness scoring + anti-gaming),
-[`rewardfuzz`](https://github.com/hinanohart/rewardfuzz) (reward gameability auditing), and
-[`mav-bench`](https://github.com/hinanohart/mav-bench) (multi-agent verification). passwedge
-sits one layer up from those: feed it the per-attempt pass/fail outcomes they (or any eval
-harness) produce, and it tells you how *reliably* the agent succeeds. For confidence /
-hallucination fragility see [`yuragi`](https://github.com/hinanohart/yuragi); for streaming
-inference verification see [`conformlock`](https://github.com/hinanohart/conformlock).
+passwedge is the *measurement layer*: feed it per-attempt pass/fail outcomes (a bool list,
+a JSON file, or a trace export) and it tells you how *reliably* the agent succeeds.
+
+It deliberately does **not** run rollouts, score reward/fitness functions, audit reward
+gameability, or detect reward hacking. Related tools for those concerns:
+
+| Tool | Role |
+| --- | --- |
+| [`scorewright`](https://github.com/hinanohart/scorewright) | fitness scoring + anti-gaming |
+| [`rewardfuzz`](https://github.com/hinanohart/rewardfuzz) | reward gameability auditing |
+| [`mav-bench`](https://github.com/hinanohart/mav-bench) | multi-agent verification |
+| [`yuragi`](https://github.com/hinanohart/yuragi) | confidence / hallucination fragility |
+| [`conformlock`](https://github.com/hinanohart/conformlock) | streaming inference verification |
 
 ## License
 
