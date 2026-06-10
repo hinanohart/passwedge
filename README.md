@@ -15,7 +15,26 @@ gap: capability vs. reliability.
 - Ships three ways: a **library**, a **pytest plugin** (`@pytest.mark.passk`), and a
   **GitHub Action** that comments a reliability table on your PRs.
 
-> Alpha (`0.0.1a1`). The API may change before `0.1.0`.
+> Alpha (`0.0.1a2`). The API may change before `0.1.0`.
+
+## Architecture
+
+```mermaid
+flowchart TD
+    Input[Repeated attempt outcomes\nbool list or JSON file] --> Coerce[coerce_trial\ndata.py]
+    Coerce --> Trial[Trial n attempts c successes]
+    Trial --> Cap[Capability metrics\npass_at_k]
+    Trial --> Rel[Reliability metrics\npass_pow_k RDC VAF GDS]
+    Trial --> Bayes[Bayesian metrics\nbeta_posterior dirichlet_posterior]
+    Episodes[Episodes with tool traces] --> MOP[Meltdown onset\nmeltdown_onset_point]
+    Cap --> Report[ReliabilitySummary]
+    Rel --> Report
+    Bayes --> Report
+    MOP --> Report
+    Report --> CLI[CLI passwedge ci\nMarkdown report GITHUB_OUTPUT exit code]
+    Report --> Plugin[pytest plugin\npass or fail test run]
+    Report --> Action[GitHub Action\nPR comment table]
+```
 
 ## Install
 
@@ -78,11 +97,25 @@ def test_agent_is_reliable():
     assert run_agent().solved   # executed 20×; passes iff pass^5 >= 0.9
 ```
 
-## Metrics
+## How it works
+
+### Data model
+
+passwedge uses three levels of granularity, all accepting bare `list[bool]` at the entry point:
+
+| Type | Purpose |
+| --- | --- |
+| `Trial` | Sufficient statistics (`n`, `c`) for one task across all attempts |
+| `Episode` | One rollout: success flag + optional tool-call trace + subtask results |
+| `Step` | One tool call inside an episode (required only for MOP) |
+
+`coerce_trial()` accepts any of these forms and normalises them so every metric receives the same `Trial` object.
+
+### Metrics
 
 | Metric | Meaning | Source |
 | --- | --- | --- |
-| `pass_at_k` | probability ≥1 of k attempts succeeds | Chen et al. 2021 (arXiv:2107.03374) |
+| `pass_at_k` | probability >=1 of k attempts succeeds | Chen et al. 2021 (arXiv:2107.03374) |
 | `pass_pow_k` | probability **all** k attempts succeed | Beyond pass@1 (arXiv:2603.29231), Def. 2 |
 | `reliability_decay_curve` / `_slope` | how pass^k decays with task duration (RDC/RDS) | arXiv:2603.29231, Def. 3 |
 | `variance_amplification_factor` | VAF: variance ratio long-vs-short bucket | arXiv:2603.29231, Def. 4 |
@@ -98,6 +131,14 @@ def test_agent_is_reliable():
 > **MOP thresholds are dataset-specific.** `meltdown_onset_point` requires explicit
 > `theta_h`, `delta`, `w` (no defaults). The paper's calibration is exposed as
 > `MOP_PAPER_DEFAULTS` but applying it verbatim to other data produces false positives.
+
+### Report and output
+
+After computing metrics, `summarize()` produces a `ReliabilitySummary` dataclass. From there:
+
+- `render_markdown()` formats a Markdown table for human reading or PR comments.
+- The CLI (`passwedge ci`) writes the report, emits `$GITHUB_OUTPUT` key=value lines, and exits non-zero on threshold failure.
+- The GitHub Action wraps the CLI and posts the table as a PR comment automatically.
 
 ## Where it fits
 
