@@ -21,19 +21,19 @@ gap: capability vs. reliability.
 
 ```mermaid
 flowchart TD
-    Input[Repeated attempt outcomes\nbool list or JSON file] --> Coerce[coerce_trial\ndata.py]
+    Input[Repeated attempt outcomes<br>bool list or JSON file] --> Coerce[coerce_trial<br>data.py]
     Coerce --> Trial[Trial n attempts c successes]
-    Trial --> Cap[Capability metrics\npass_at_k]
-    Trial --> Rel[Reliability metrics\npass_pow_k RDC VAF GDS]
-    Trial --> Bayes[Bayesian metrics\nbeta_posterior dirichlet_posterior]
-    Episodes[Episodes with tool traces] --> MOP[Meltdown onset\nmeltdown_onset_point]
+    Trial --> Cap[Capability metrics<br>pass_at_k]
+    Trial --> Rel[Reliability metrics<br>pass_pow_k RDC VAF GDS]
+    Trial --> Bayes[Bayesian metrics<br>beta_posterior dirichlet_posterior]
+    Episodes[Episodes with tool traces] --> MOP[Meltdown onset<br>meltdown_onset_point]
     Cap --> Report[ReliabilitySummary]
     Rel --> Report
     Bayes --> Report
     MOP --> Report
-    Report --> CLI[CLI passwedge ci\nMarkdown report GITHUB_OUTPUT exit code]
-    Report --> Plugin[pytest plugin\npass or fail test run]
-    Report --> Action[GitHub Action\nPR comment table]
+    Report --> CLI[CLI passwedge ci<br>Markdown report GITHUB_OUTPUT exit code]
+    Report --> Plugin[pytest plugin<br>pass or fail test run]
+    Report --> Action[GitHub Action<br>PR comment table]
 ```
 
 ## Install
