@@ -23,8 +23,8 @@ gap: capability vs. reliability.
 flowchart TD
     Input[Repeated attempt outcomes<br>bool list or JSON file] --> Coerce[coerce_trial<br>data.py]
     Coerce --> Trial[Trial n attempts c successes]
-    Trial --> Cap[Capability metrics<br>pass_at_k]
-    Trial --> Rel[Reliability metrics<br>pass_pow_k RDC VAF GDS]
+    Trial --> Cap[Capability metrics<br>pass_at_k pass_pow_k]
+    Trial --> Rel[Reliability metrics<br>RDC VAF GDS]
     Trial --> Bayes[Bayesian metrics<br>beta_posterior dirichlet_posterior]
     Episodes[Episodes with tool traces] --> MOP[Meltdown onset<br>meltdown_onset_point]
     Cap --> Report[ReliabilitySummary]
